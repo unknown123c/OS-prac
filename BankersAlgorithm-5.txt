@@ -1,0 +1,93 @@
+#include <stdio.h>
+
+int max[10][10], allocation[10][10], need[10][10], avail[10];
+int np, nr;
+
+void read_matrix(int matrix[10][10]) {
+    for (int i = 0; i < np; i++)
+        for (int j = 0; j < nr; j++)
+            scanf("%d", &matrix[i][j]);
+}
+
+void display_matrix(int matrix[10][10]) {
+    for (int i = 0; i < np; i++) {
+        printf("\nP%d: ", i);
+        for (int j = 0; j < nr; j++)
+            printf("%d ", matrix[i][j]);
+    }
+}
+
+void calculate_need() {
+    for (int i = 0; i < np; i++)
+        for (int j = 0; j < nr; j++)
+            need[i][j] = max[i][j] - allocation[i][j];
+}
+
+void banker() {
+    int finish[10] = {0}, safe_seq[10], k = 0;
+
+    for (int i = 0; i < np; i++) {
+        int can_satisfy = 1;
+        for (int j = 0; j < nr; j++) {
+            if (need[i][j] > avail[j]) {
+                can_satisfy = 0;
+                break;
+            }
+        }
+        if (can_satisfy && !finish[i]) {
+            for (int j = 0; j < nr; j++)
+                avail[j] += allocation[i][j];
+            finish[i] = 1;
+            safe_seq[k++] = i;
+            i = -1;
+        }
+    }
+
+    int deadlock = 0;
+    for (int i = 0; i < np; i++) {
+        if (!finish[i]) {
+            printf("\nSystem is in deadlock\n");
+            deadlock = 1;
+            break;
+        }
+    }
+
+    if (!deadlock) {
+        printf("\nThe system is in a safe state.\nSafe sequence: ");
+        for (int i = 0; i < np; i++)
+            printf("P%d ", safe_seq[i]);
+    }
+}
+
+int main() {
+    printf("Enter number of processes: ");
+    scanf("%d", &np);
+    printf("Enter number of resources: ");
+    scanf("%d", &nr);
+
+    printf("Enter initial allocation matrix:\n");
+    read_matrix(allocation);
+    printf("Enter max requirement matrix:\n");
+    read_matrix(max);
+    printf("Enter available resources:\n");
+    for (int j = 0; j < nr; j++)
+        scanf("%d", &avail[j]);
+
+    calculate_need();
+
+    printf("\nInitial Allocation:\n");
+    display_matrix(allocation);
+    printf("\n\nMaximum Requirement:\n");
+    display_matrix(max);
+    printf("\n\nAvailable Resources: ");
+    for (int j = 0; j < nr; j++)
+        printf("%d ", avail[j]);
+
+    printf("\n\nNeed Matrix:\n");
+    display_matrix(need);
+
+    banker();
+
+    return 0;
+}
+

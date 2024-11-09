@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int mutex = 1, full = 0, empty = 10, x = 0;
+
+void producer() {
+    mutex--;
+    full++;
+    empty--;
+    printf("\nProducer produces item %d", ++x);
+    mutex++;
+}
+
+void consumer() {
+    mutex--;
+    full--;
+    empty++;
+    printf("\nConsumer consumes item %d", x--);
+    mutex++;
+}
+
+int main() {
+    int choice;
+    printf("1. Press 1 for Producer\n2. Press 2 for Consumer\n3. Press 3 for Exit\n");
+
+    while (1) {
+        printf("\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        if (choice == 1) {
+            if (mutex == 1 && empty != 0) producer();
+            else printf("Buffer is full!");
+        } 
+        else if (choice == 2) {
+            if (mutex == 1 && full != 0) consumer();
+            else printf("Buffer is empty!");
+        } 
+        else if (choice == 3) {
+            exit(0);
+        } 
+        else {
+            printf("Invalid choice! Please select 1, 2, or 3.");
+        }
+    }
+}
+

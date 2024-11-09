@@ -1,0 +1,78 @@
+#!/bin/bash       
+
+# Function to create the address book file if it doesn't exist
+createAddressBook() { 
+  if [ ! -e addressbook.txt ]; then 
+    touch addressbook.txt 
+    echo "Address book created."
+  else 
+    echo "Address book already exists."
+  fi 
+}
+
+# Function to insert a new record in the format "Last,First,Email,Phone"
+insertRecord() { 
+  while true; do 
+    echo -e "Enter record as \"Last,First,Email,Phone\" or 'q' to quit:"
+    read record
+    if [ "$record" == "q" ]; then break; fi
+    echo "$record" >> addressbook.txt 
+    echo "Record inserted."
+  done 
+}
+
+# Function to view a record by last name
+viewRecord() { 
+  while true; do 
+    echo -e "Enter last name to view record or 'q' to quit:"
+    read lastName
+    if [ "$lastName" == "q" ]; then break; fi
+    grep "$lastName" addressbook.txt || echo "No record found."
+  done 
+}
+
+# Function to search for a record by last name
+searchRecord() { 
+  while true; do 
+    echo -e "Enter last name to search or 'q' to quit:"
+    read searchName
+    if [ "$searchName" == "q" ]; then break; fi
+    grep "$searchName" addressbook.txt || echo "No record found."
+  done 
+}
+
+# Function to delete a record by last name or email
+deleteRecord() { 
+  while true; do 
+    echo -e "Enter last name or email to delete or 'q' to quit:"
+    read deleteKey
+    if [ "$deleteKey" == "q" ]; then break; fi
+
+    # Display matching records with line numbers
+    grep -n "$deleteKey" addressbook.txt || { echo "No record found."; continue; }
+    echo "Enter the line number to delete:"
+    read lineNumber
+    sed -i "${lineNumber}d" addressbook.txt && echo "Record deleted."
+  done
+}
+
+# Program menu with options to interact with the address book
+while true; do 
+  echo -e "\nAddress Book - Choose an option:"
+  echo "1. Create Address Book"
+  echo "2. Insert Record"
+  echo "3. View Record"
+  echo "4. Search Record"
+  echo "5. Delete Record"
+  read choice
+  
+  case $choice in 
+    1) createAddressBook ;; 
+    2) insertRecord ;; 
+    3) viewRecord ;; 
+    4) searchRecord ;; 
+    5) deleteRecord ;; 
+    *) echo "Invalid option." ;;
+  esac 
+done
+
